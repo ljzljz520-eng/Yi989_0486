@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "metrics": {
+    "production_loc": 2314,
+    "production_files": 33,
+    "production_packages": 11,
+    "test_files": 10,
+    "production_functions": 158,
+    "decision_points": 325
+  },
+  "persistence": {
+    "module": "go.etcd.io/bbolt",
+    "entities": [
+      "Batch",
+      "Record",
+      "Audit",
+      "Profile"
+    ],
+    "reopen_test": "TestPersistenceSurvivesReopen"
+  },
+  "workflows": [
+    {
+      "steps": [
+        "accept operator request and batch details",
+        "validate amount validity stock and permissions",
+        "persist Batch and Audit in embedded storage",
+        "confirm the batch in the filtered exportable list"
+      ],
+      "test": "TestWorkflowAccept"
+    },
+    {
+      "steps": [
+        "queue a storefront claim for an available batch",
+        "process confirmation into a durable Record",
+        "review inventory and audit state",
+        "publish an independent reclaim transition"
+      ],
+      "test": "TestWorkflowPublish"
+    },
+    {
+      "steps": [
+        "open bbolt storage at the configured path",
+        "update persisted batch profile and claim entities",
+        "close the storage handle cleanly",
+        "reopen and verify all durable records"
+      ],
+      "test": "TestWorkflowReopen"
+    },
+    {
+      "steps": [
+        "confirm a claim once",
+        "invoke immediate reclaim after confirmation",
+        "observe the independent record state",
+        "verify inventory returned to the batch"
+      ],
+      "test": "TestWorkflow28"
+    }
+  ]
+}
